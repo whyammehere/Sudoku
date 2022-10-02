@@ -40,11 +40,11 @@
       input:focus {
         background-color: rgb(21, 173, 47);
       }
-	  
+    
       input:disabled {
         background-color: #851515;
       }
-	  
+    
       input:readonly {
         background-color: #EEEEEE;
       }
@@ -114,31 +114,43 @@
 <script>
 //this is the array contains all values
 var gBoard_easy = [
-		 0,5,0,0,0,2,3,8,0
-		,0,1,0,0,0,4,0,0,5
-		,0,2,0,0,5,0,0,0,0
-		,5,0,7,8,0,0,2,1,0
-		,4,6,0,2,3,7,0,5,8
-		,0,9,8,0,0,5,4,0,7
-		,0,0,0,0,6,0,0,4,0
-		,1,0,0,9,0,0,0,6,0
-		,0,7,3,4,0,0,0,9,0
-	];
-  
+   0,5,0,0,0,2,3,8,0
+  ,0,1,0,0,0,4,0,0,5
+  ,0,2,0,0,5,0,0,0,0
+  ,5,0,7,8,0,0,2,1,0
+  ,4,6,0,2,3,7,0,5,8
+  ,0,9,8,0,0,5,4,0,7
+  ,0,0,0,0,6,0,0,4,0
+  ,1,0,0,9,0,0,0,6,0
+  ,0,7,3,4,0,0,0,9,0
+  ];
+
 var gBoard_hard = [
-		 0,0,0,5,8,0,4,7,0
-		,6,0,0,0,0,0,9,5,0
-		,2,0,0,0,0,0,0,0,0
-		,0,0,4,0,0,2,0,0,0
-		,7,0,2,8,0,0,0,0,4
-		,0,0,0,0,3,0,2,6,5
-		,0,0,0,0,5,0,0,0,0
-		,0,2,0,7,0,3,0,0,0
-		,0,8,0,0,9,0,0,0,6
-	];
+   0,0,0,5,8,0,4,7,0
+  ,6,0,0,0,0,0,9,5,0
+  ,2,0,0,0,0,0,0,0,0
+  ,0,0,4,0,0,2,0,0,0
+  ,7,0,2,8,0,0,0,0,4
+  ,0,0,0,0,3,0,2,6,5
+  ,0,0,0,0,5,0,0,0,0
+  ,0,2,0,7,0,3,0,0,0
+  ,0,8,0,0,9,0,0,0,6
+  ];
 
-  var gBoard_expert = [
+var gBoard_expert = [
    5,1,0,9,2,0,0,7,0
+  ,3,6,0,0,5,0,0,0,0
+  ,0,0,0,0,4,0,0,0,0
+  ,0,0,0,0,0,0,0,0,0
+  ,6,0,0,0,0,0,5,4,0
+  ,0,8,2,7,0,0,0,9,0
+  ,0,0,0,0,0,0,0,0,9
+  ,0,0,8,0,0,4,0,0,0
+  ,0,0,0,8,0,0,3,0,6
+  ];
+
+var gBoard_expert2 = [
+   5,1,0,9,0,0,0,7,0
   ,3,6,0,0,5,0,0,0,0
   ,0,0,0,0,4,0,0,0,0
   ,0,0,0,0,0,0,0,0,0
@@ -149,63 +161,66 @@ var gBoard_hard = [
   ,0,0,0,8,0,0,3,0,6
 ];
 
-var gBoard = [
-   5,1,0,9,2,0,0,7,0
-  ,3,6,0,0,5,0,0,0,0
-  ,0,0,0,0,4,0,0,0,0
-  ,0,0,0,0,0,0,0,0,0
-  ,6,0,0,0,0,0,5,4,0
-  ,0,8,2,7,0,0,0,9,0
-  ,0,0,0,0,0,0,0,0,9
-  ,0,0,8,0,0,4,0,0,0
-  ,0,0,0,8,0,0,3,0,6
-];
+//=========================================================================================
+var gBoard = new Array(81);
+for (let i = 0; i < gBoard.length; i++) {
+  gBoard[i] = 0;
+}
 
 //this variable is to store the status of each cell
 //0 = not available, 1 = available
-var gCellStatus = [];
+var gCellStatus = new Array(81);
 
 //this array gCandidate[81][10] is used to store the candidate of each cell, the first position is the number of candidates
 //for example, a candidate[i][0] means the number of candidates for cell i
 //candidate[i][j] == 1 means value j is a valid candidate of cell i
 var gCandidate = new Array(81);
-
 for (let i = 0; i < gCandidate.length; i++) {
   gCandidate[i] = new Array(10);
   gCandidate[i][0] = 9;
   for (let j=1; j<=9; j++) gCandidate[i][j] = 1;
 }
 
-//this array is used to save the current board during trialAndError()
-var gBoardFloor = new Array(81);
+//gOccurrence is used to store the occurrence of each number from 1 to 9 
+var gOccurrence = new Array(9);
 
 //tell which floor of trialAndError() it is right now
 var gCurFloor = 0;
 
-//which candidate it is trying
-var gCurFloorTry = new Array(81);
-for (let i = 0; i < gCurFloorTry.length; i++) {
-  gCurFloorTry[i] = -1;
+//array gBoardFloor[floor=81][81] is used to save the  gBoard for current floor during trialAndError()
+var gBoardFloor = new Array(81);
+for (let i = 0; i < gBoardFloor.length; i++) {
+  gBoardFloor[i] = new Array(81);
 }
 
-//gOccurrence is used to store the occurrence of each number from 1 to 9 
-var gOccurrence = new Array(9);
+//gFloorCell[floor=81] is used to save the cell index for current floor during trialAndError()
+var gFloorCell = new Array(81);
+for (let i = 0; i < gFloorCell.length; i++) {
+  gFloorCell[i] = -1;
+}
 
+//gFloorCandidateIndex[floor=81] is to tell which candidate it is trying
+var gFloorCandidateIndex = new Array(81);
+for (let i = 0; i < gFloorCandidateIndex.length; i++) {
+  gFloorCandidateIndex[i] = -1;
+}
+
+//=========================================================================================
 //shortcut function to get an  Element
 function $(id)
 {
-	return document.getElementById(id);
+  return document.getElementById(id);
 }
 
 //shortcut for logging..
 function log(msg){
-	if(window.console && console.log) console.log(msg);
-	$("msg2").innerHTML = msg;
+  if(window.console && console.log) console.log(msg);
+  $("msg2").innerHTML = msg;
 }
 
 //shortcut for showing message in message bar..
 function messageBox(msg){
-	$("msgbar").innerHTML = msg;
+  $("msgbar").innerHTML = msg;
 }
 
 //Add onkeyup and onclick events to each cell
@@ -213,173 +228,193 @@ function messageBox(msg){
 //we can use "<body onload="addEvents()">
 function addEvents() 
 {
-	log("calling function addEvents()");
-	for (let i = 0; i < 81; i++) {
-		id = "cell-" + i;
-		$(id).addEventListener("keyup", myKeyUpFunc);
-		//log('adding onkeyup="myKeyUpFunc()" to element "' + id +'"' );
-		
-		$(id).addEventListener("click", myClickFunc);
-		//log('adding onkeyup="myKeyUpFunc()" to element "' + id +'"' );
+  log("calling function addEvents()");
+  for (let i = 0; i < 81; i++) {
+    id = "cell-" + i;
+    //log('adding onkeyup="myKeyUpFunc()" to element "' + id +'"' );
+    $(id).addEventListener("keyup", myKeyUpFunc);
+    
+    //log('adding onkeyup="myKeyUpFunc()" to element "' + id +'"' );
+    $(id).addEventListener("click", myClickFunc);
 
-        $(id).addEventListener("keypress",onlyNumberKey);
-	} 
+    $(id).addEventListener("keypress",onlyNumberKey);
+  } 
 }
 
 function myClickFunc() 
 {
-	var x = document.activeElement;
-	changeBgColor(x.id);
-	highLightSameValues(x.id);
+  var x = document.activeElement;
+  changeBgColor(x.id);
+  highLightSameValues(x.id);
   findCellCandidates(x.id);
 }
 
 function myKeyUpFunc() 
 {
-	var x = document.activeElement;
-	//x.value = x.value.toUpperCase();
-	x.value = x.value.trim();
-	highLightSameValues(x.id);
+  var x = document.activeElement;
+  //x.value = x.value.toUpperCase();
+  x.value = x.value.trim();
+  highLightSameValues(x.id);
 }
-	
+  
 //determine row and col in the 9x9 board, and also the 3x3 puzzle id
 function getRowColPuzzleID(cellid)
 {
-	var idx = Number(cellid.substr(5));   //this will convert cell-6 to 6
-	var row = parseInt(idx/9);
-	var col = idx % 9;
-	var puzzleID = parseInt(col/3) + 3 * parseInt(row/3);
-	
-	//log("getRowColPuzzleID(" + cellid + ") --> [row, col, puzzleID]=["+ row + ", " + col + ", "+puzzleID+"]");
-	return [row,col,puzzleID];
+  var idx = Number(cellid.substr(5));   //this will convert cell-6 to 6
+  var row = parseInt(idx/9);
+  var col = idx % 9;
+  var puzzleID = parseInt(col/3) + 3 * parseInt(row/3);
+  
+  //log("getRowColPuzzleID(" + cellid + ") --> [row, col, puzzleID]=["+ row + ", " + col + ", "+puzzleID+"]");
+  return [row,col,puzzleID];
 }
 
 
 function changeBgColor(cellid)
 {
-	//first reset all cell's backgroundColor 
-	for (let i = 0; i < 81; i++) {
-		let id = "cell-" + i;
-		$(id).style.backgroundColor= "#FFFFFF";
-	}  
-	
-	//get row and col in the 9x9 board, and also the 3x3 puzzle id
-	const [row,col,puzzleID] = getRowColPuzzleID(cellid);
-	
-	//change bg color for the whole row
-	for (let i = 0; i < 9; i++) {
-		let id = "cell-" + (row*9 + i);
-		$(id).style.backgroundColor= "#e6e6e6";		
-		//log("change bg color to '" + id + "'");
-	}  
-	
-	//change bg color for the whole col	
-	for (let i = 0; i < 9; i++) {
-		let id = "cell-" + (i*9 + col);
-		$(id).style.backgroundColor= "#e6e6e6";			
-		//log("change bg color to '" + id + "'");
-	}  
+  //first reset all cell's backgroundColor 
+  for (let i = 0; i < 81; i++) {
+    let id = "cell-" + i;
+    $(id).style.backgroundColor= "#FFFFFF";
+  }  
+  
+  //get row and col in the 9x9 board, and also the 3x3 puzzle id
+  const [row,col,puzzleID] = getRowColPuzzleID(cellid);
+  
+  //change bg color for the whole row
+  for (let i = 0; i < 9; i++) {
+    let id = "cell-" + (row*9 + i);
+    $(id).style.backgroundColor= "#e6e6e6";    
+    //log("change bg color to '" + id + "'");
+  }  
+  
+  //change bg color for the whole col  
+  for (let i = 0; i < 9; i++) {
+    let id = "cell-" + (i*9 + col);
+    $(id).style.backgroundColor= "#e6e6e6";      
+    //log("change bg color to '" + id + "'");
+  }  
 
-	//change bg color for the whole small 3x3 puzzle	
-	let startrow = parseInt(puzzleID / 3) * 3;
-	let startcol = parseInt(puzzleID % 3) * 3;
-	for (let i = 0; i < 3; i++) {
-		for (let j = 0; j < 3; j++) {
-			let id = "cell-" + ((i+startrow)*9 + (j+startcol));
-			$(id).style.backgroundColor= "#e6e6e6";			
-			//log("change bg color to '" + id + "'");
-		}  
-	}
+  //change bg color for the whole small 3x3 puzzle  
+  let startrow = parseInt(puzzleID / 3) * 3;
+  let startcol = parseInt(puzzleID % 3) * 3;
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      let id = "cell-" + ((i+startrow)*9 + (j+startcol));
+      $(id).style.backgroundColor= "#e6e6e6";      
+      //log("change bg color to '" + id + "'");
+    }  
+  }
 }
 
 //highlight cells with the same value
 function highLightSameValues(cellid)
 {
-	var v = parseInt($(cellid).value.trim());
-	if (v > 0 && v < 10) {
-		for (let i = 0; i < 81; i++) {
-			id = "cell-" + i;
-			var cell = $(id);      
-			if (cell.value == v) {
-				cell.style.color = "#ff9933";
-				cell.style.fontWeight = "bolder";
-			}
-			else {
-				if(cell.readOnly || cell.disabled) {
-					cell.style.color = "black";
-				}
-				else {
-					cell.style.color = "blue";
-				}
-				cell.style.fontWeight = "normal";			
-			}
-		}
-	}
+  var v = parseInt($(cellid).value.trim());
+  if (v > 0 && v < 10) {
+    for (let i = 0; i < 81; i++) {
+      id = "cell-" + i;
+      var cell = $(id);      
+      if (cell.value == v) {
+        cell.style.color = "#ff9933";
+        cell.style.fontWeight = "bolder";
+      }
+      else {
+        if(cell.readOnly || cell.disabled) {
+          cell.style.color = "black";
+        }
+        else {
+          cell.style.color = "blue";
+        }
+        cell.style.fontWeight = "normal";      
+      }
+    }
+  }
 }
 
 //initialize the board with the given array, set cells with values to readonly  
 function initBoard(board)
 {
-	log("calling function initBoard()");
-	for (let i = 0; i < 9; i++) {gOccurrence[i]=0};
-	for (let i = 0; i < 81; i++) {	
-		let id = "cell-" + i;
+  log("calling function initBoard()");
+  for (let i = 0; i < 9; i++) {gOccurrence[i]=0};
+  for (let i = 0; i < 81; i++) {  
+    let id = "cell-" + i;
     let v = board[i];  //use v to make the next block short
-		if(v>0 && v<10) {
-			$(id).value = v;
-			$(id).readOnly = true;
+    if(v>0 && v<10) {
+      $(id).value = v;
+      $(id).readOnly = true;
       gOccurrence[v-1] += 1;
       gCellStatus[i] = 0;
-		}
-		else{
-			$(id).value = '';
-			$(id).readOnly = false;		
+    }
+    else{
+      $(id).value = '';
+      $(id).readOnly = false;    
 
       gCellStatus[i] = 1;
-		}
-	}  	
+    }
+  }    
 
   for (let v = 1; v <= 9; v++) {
     $("btn"+v).value = v+"("+gOccurrence[v-1]+")";
     if (gOccurrence[v-1] >= 9) {
       $("btn"+v).disabled = true;
     }
+    else {
+      $("btn"+v).disabled = false;
+    }
   }
-}		
+}    
 
 //update the board with the given array
 function updateBoardByArray(board)
 {
-	for (let i = 0; i < 81; i++) {	
-		id = "cell-" + i;
-		if(board[i]>0 && board[i]<10) {
+  for (let i = 0; i < 81; i++) {  
+    id = "cell-" + i;
+    if(board[i]>0 && board[i]<10) {
       $(id).value = board[i]; 
     }
-		else {
+    else {
       $(id).value = '';
     }
-	}  	
-}		
+  }     
+  updateArrayByBoard();
+}    
 
 //update the global array with current sudoku board
 function updateArrayByBoard()
 {
-	for (let i = 0; i < 9; i++) {gOccurrence[i]=0};
-
-	for (let i = 0; i < 81; i++) {	
-		let id = "cell-" + i;
+  //reset gOccurrence[], gCellStatus[] and gBoard[]
+  for (let i = 0; i < 9; i++) {gOccurrence[i]=0};
+  for (let i = 0; i < 81; i++) {  
+    let id = "cell-" + i;
     let v = $(id).value;
-		if(v>0 && v<10) {
+    if(v>0 && v<10) {
       gBoard[i] = v;
-      gOccurrence[v] += 1;
+      gOccurrence[v-1] += 1;
       gCellStatus[i] = 0;
     }
-		else{
-      gBoard[i] = 0;	
+    else{
+      gBoard[i] = 0;  
       gCellStatus[i] = 1;
-    }	
-	}  	
-}		
+    }  
+  }    
+  
+  //reset gCandidate[81][10]
+  for (let i = 0; i < 81; i++) {  
+    findCellCandidates('cell-'+i);
+  }
+
+  //reset botton names
+  for (let v = 1; v <= 9; v++) {
+    $("btn"+v).value = v+"("+gOccurrence[v-1]+")";
+    if (gOccurrence[v-1] >= 9) {
+      $("btn"+v).disabled = true;
+    }
+    else {
+      $("btn"+v).disabled = false;
+    }
+  }
+}    
 
 function onlyNumberKey() {
   var theEvent = window.event;
@@ -401,7 +436,7 @@ function onlyNumberKey() {
 
 function buildTable()
 {
-	log("calling function buildTable()");
+  log("calling function buildTable()");
   let table = document.createElement('table');
   table.setAttribute("id", "grid");
   //let thead = document.createElement('thead');
@@ -420,10 +455,10 @@ function buildTable()
       table.appendChild(td);
     }
   }
-
   $("tableContainer").appendChild(table);
+
   addEvents();
-  initBoard(gBoard_expert);
+  initBoard(gBoard_expert2);
 }
 
 function findCellCandidates(cellid) 
@@ -439,47 +474,47 @@ function findCellCandidates(cellid)
     return;
   }
 
-	//get row and col in the 9x9 board, and also the 3x3 puzzle id
-	const [row,col,puzzleID] = getRowColPuzzleID(cellid);
-	
+  //get row and col in the 9x9 board, and also the 3x3 puzzle id
+  const [row,col,puzzleID] = getRowColPuzzleID(cellid);
+  
   gCandidate[idx][0]=9;
   for (let j=1; j<=9; j++) gCandidate[idx][j]=1;
 
-	//check this row to remove invalid candidates
-	for (let c = 0; c < 9; c++) {
-	  let id = "cell-" + (row*9 + c);
-		v = $(id).value;		
+  //check this row to remove invalid candidates
+  for (let c = 0; c < 9; c++) {
+    let id = "cell-" + (row*9 + c);
+    v = $(id).value;    
     if (v > 0 && v < 10 && gCandidate[idx][v] != 0) {
       gCandidate[idx][v]=0;
-      gCandidate[idx][0]-=1;	
+      gCandidate[idx][0]-=1;  
     }
-	}  
-	
-	//check this column to remove invalid candidates
-	for (let r = 0; r < 9; r++) {
-		let id = "cell-" + (r*9 + col);
-    v = $(id).value;		
+  }  
+  
+  //check this column to remove invalid candidates
+  for (let r = 0; r < 9; r++) {
+    let id = "cell-" + (r*9 + col);
+    v = $(id).value;    
     if (v > 0 && v < 10 && gCandidate[idx][v] != 0) {
       gCandidate[idx][v]=0;
-      gCandidate[idx][0]-=1;	
-    }		
-	}  
+      gCandidate[idx][0]-=1;  
+    }    
+  }  
 
-	//check the small 3x3 puzzle to remove invalid candadites
-	let startrow = parseInt(puzzleID / 3) * 3;
-	let startcol = parseInt(puzzleID % 3) * 3;
-	for (let i = 0; i < 3; i++) {
-		for (let j = 0; j < 3; j++) {
-			let id = "cell-" + ((startrow+i)*9 + (startcol+j));
-      v = $(id).value;		
+  //check the small 3x3 puzzle to remove invalid candadites
+  let startrow = parseInt(puzzleID / 3) * 3;
+  let startcol = parseInt(puzzleID % 3) * 3;
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      let id = "cell-" + ((startrow+i)*9 + (startcol+j));
+      v = $(id).value;    
       if (v > 0 && v < 10 && gCandidate[idx][v] != 0) {
         gCandidate[idx][v]=0;
-        gCandidate[idx][0]-=1;		
+        gCandidate[idx][0]-=1;    
       }  
-	  }
+    }
   }
 
-  let msg = cellid + '(row='+row+', col='+col+') status = '+gCellStatus[idx]+', has ' +gCandidate[idx][0]+ ' candidate(s): ';
+  let msg = cellid + '(row='+row+', col='+col+') status='+gCellStatus[idx]+', has ' +gCandidate[idx][0]+ ' candidate(s): ';
   for (let i=1; i<=9; i++) {
     if (gCandidate[idx][i]) msg +=  (i + ', ');
   } 
@@ -498,7 +533,7 @@ function updateCell(caller,cellid,v)
 {
   if(v<1 || v>9) return;
 
-	let idx = Number(cellid.substr(5));   //this will convert cell-6 to 6
+  let idx = Number(cellid.substr(5));   //this will convert cell-6 to 6
   $(cellid).value = v;
   gBoard[idx] = v;
   gCellStatus[idx] = 0;
@@ -513,7 +548,7 @@ function updateCell(caller,cellid,v)
   $(cellid).style.color = 'blue';
   highLightSameValues(id);
   
-  log(caller + ': set ' + cellid + ' to value ' + v);
+  log('updateCell: '+caller + ': set ' + cellid + ' to value ' + v);
 
   //reset gCellStatus
   updateArrayByBoard();
@@ -532,7 +567,7 @@ function updateByCandidate()
       if (gCandidate[i][0] == 1) {
         for (let j=1; j<=9; j++) {
           if (gCandidate[i][j] != 0) {
-            updateCell("'updateByCandidate()",id,j);
+            updateCell("updateByCandidate()",id,j);
             found = 1;
             break; //break j
           } 
@@ -553,30 +588,30 @@ function updateByCandidateAuto()
     updateN += updateByCandidate();
   }
   //reset all cell's backgroundColor 
-	for (let i = 0; i < 81; i++) {
-		id = "cell-" + i;
-		$(id).style.backgroundColor= "#FFFFFF";
-	}  
+  for (let i = 0; i < 81; i++) {
+    id = "cell-" + i;
+    $(id).style.backgroundColor= "#FFFFFF";
+  }  
 }
 
 //disable the spaces that are impossible to fill n
 function disableInvalidSpace(n)
 {
   //first enable all spaces 
-	for (let i = 0; i < 81; i++) {
+  for (let i = 0; i < 81; i++) {
     let id = "cell-" + i;
-		gCellStatus[i] = 1;
+    gCellStatus[i] = 1;
     $(id).style.backgroundColor = "#FFFFFF";
     if ($(id).value > 0 && $(id).value < 10) {
       gCellStatus[i] = 0;
       $(id).style.backgroundColor = "red";
     }
-	}  
+  }  
 
-  //loop though each 3x3 puzzle	to find n
+  //loop though each 3x3 puzzle  to find n
   for (let puzzleID = 0; puzzleID < 9; puzzleID++) {
-	  let startrow = parseInt(puzzleID / 3) * 3;
-	  let startcol = parseInt(puzzleID % 3) * 3;
+    let startrow = parseInt(puzzleID / 3) * 3;
+    let startcol = parseInt(puzzleID % 3) * 3;
     let found = 0;
     for (let i = 0; i < 3; i++) {
       for (let j = 0; j < 3; j++) {
@@ -609,19 +644,19 @@ function disableInvalidSpace(n)
             }
           }
           break; //break from j
-        }		
+        }    
         if (found) {
           break; //break from i
         }
       }
     }  
-	}
+  }
 }
 
 //try value n, update only one cell each call
 function tryValueN(n)
 {
-  //disableInvalidSpaces(n) will change gCellStatus to 0, need to reset everytime disableInvalidSpaces(n) is called
+  //disableInvalidSpaces(n) will change gCellStatus[] to 0, need to reset it at the end of this called
   disableInvalidSpace(n);
 
   //check each row for available space
@@ -681,6 +716,9 @@ function tryValueN(n)
       return 1;
     }
   }
+
+  //reset gCellStatus[] using the board
+  updateArrayByBoard();
   return 0;
 }
 
@@ -694,69 +732,163 @@ function tryValueAuto()
     }
   }
   //reset all cell's backgroundColor 
-	for (let i = 0; i < 81; i++) {
-		id = "cell-" + i;
-		$(id).style.backgroundColor= "#FFFFFF";
-	}  
+  for (let i = 0; i < 81; i++) {
+    id = "cell-" + i;
+    $(id).style.backgroundColor= "#FFFFFF";
+  }  
 }
 
+function addFloorMsg(msg)
+{
+  var line = document.createElement("p");
+  line.setAttribute("id","msgFloor"+gCurFloor+"-"+gFloorCandidateIndex[gCurFloor]);
+  let text = "|";
+  for (let i=0; i<gCurFloor; i++) {
+    text += "--";
+  }
+  text += msg;
+  line.innerHTML = text;
+  $("floormsgcontainer").appendChild(line);
+  log(text);
+}
+
+function updateFloorMsg(msg)
+{
+  var line = $("msgFloor"+gCurFloor+"-"+gFloorCandidateIndex[gCurFloor]);
+  let text = "|";
+  for (let i=0; i<gCurFloor; i++) {
+    text += "--";
+  }
+  text += msg;
+  line.innerHTML = text;
+  log(text);
+}
+
+function deleteFloorMsg(floor)
+{
+  var line = $("msgFloor"+floor);
+  line.remove();
+  log("remove msgFloor"+floor);
+}
+
+
 //find the cell that has the minimum number of candidates, and try one of the candidates in this cell
-//then determine if it can solve the board, if it can, it is the right value, otherwise it is not
+//then determine if it the board can be solved or not. if it can, it is the right value, otherwise it is not
 function trialAndError()
 {
   log('calling trialAndError()');
 
   //determine which cell has the minimum number of candidates
-  let idx = 0;
-  let minCandidate = 10;
-  for (let i = 0; i < 81; i++) {
-    if (gCandidate[i][0] > 1 && gCandidate[i][0] < minCandidate) {
-      minCandidate = gCandidate[i][0];
-      idx = i;
-    }  
+  let idx = -1;
+  if(idx < 0 || idx > 80) {
+    let minCandidateNum = 10;
+    for (let i = 0; i < 81; i++) {
+      if (gCandidate[i][0] > 1 && gCandidate[i][0] < minCandidateNum) {
+        minCandidateNum = gCandidate[i][0];
+        idx = i;
+      }  
+    }
+  }
+  log('trialAndError(): current floor='+gCurFloor+', found cellIdx='+idx+', candidateNum='+gCandidate[idx][0]+', gFloorCell[gCurFloor]='+gFloorCell[gCurFloor]);
+
+  //determine if this is a new floor using gFloorCell[gCurFloor] and idx
+  //if the first candidate of current floor has not been tried yet, gFloorCell[gCurFloor]==-1
+  //when all candidates of current floor has been tried and this board is unsolvable, need to reset  gFloorCell[gCurFloor]=-1 then
+  //swing back to previous floor
+  if(gFloorCell[gCurFloor] != idx) {
+    //this should be a new floor
+    if (gCurFloor >= 80) {return 0;}
+
+    //save current board and try this candidates index
+    updateArrayByBoard();
+    for (let i = 0; i < 81; i++) {
+      gBoardFloor[gCurFloor][i] = gBoard[i];
+    }
+    
+    //create a new floor
+    gCurFloor++;
+    gFloorCandidateIndex[gCurFloor]=0;
+    gFloorCell[gCurFloor] = idx;
+    log('trialAndError(): create a new floor('+gCurFloor+'), cellIdx('+idx+'), candidateIdx('+gFloorCandidateIndex[gCurFloor]+')');
+
+    //append to the floor message bar
+    addFloorMsg('floor('+gCurFloor+'), cellIdx=('+idx+'), candidateIdx('+gFloorCandidateIndex[gCurFloor]+')');
+  }
+  else {
+    if(gFloorCandidateIndex[gCurFloor] < gCandidate[idx][0]-1) {
+      
+      updateFloorMsg('floor('+gCurFloor+'), cellIdx=('+idx+'), candidateIdx('+gFloorCandidateIndex[gCurFloor]+') <-- wrong trial');
+
+      //this is the same floor, try next candidates
+      gFloorCandidateIndex[gCurFloor]++;
+      log('trialAndError(): current floor='+gCurFloor+' cellIdx('+idx+'), try next candidateIdx('+gFloorCandidateIndex[gCurFloor]+')');
+      
+      //append the floor message bar
+      addFloorMsg('floor('+gCurFloor+'), cellIdx=('+idx+'), candidateIdx('+gFloorCandidateIndex[gCurFloor]+')');
+    }
+    else {
+      //all candidates of this cell has been verified as 'wrong answer', need to go back to previous floor
+      //reset buffer this floor
+      //deleteFloorMsg(gCurFloor);   //I want to keep all the trials in the floor message bar
+      gFloorCell[gCurFloor] = -1;
+      gFloorCandidateIndex[gCurFloor] = -1; 
+      gCurFloor--;
+      idx = gFloorCell[gCurFloor];
+      updateBoardByArray(gBoardFloor[gCurFloor]);
+      updateArrayByBoard();
+      
+      log('trialAndError(): go back to previous floor('+gCurFloor+'), cellIdx='+idx);
+      
+      let ret = trialAndError();
+      return ret;      
+    }
+
   }
 
-  //save current board and try one of these candidates
-  updateArrayByBoard();
-  gBoardFloor[gCurFloor] = new Array(81);
-  for (let i = 0; i < 81; i++) {
-    gBoardFloor[gCurFloor][i] = gBoard[i];
-  }
-  gCurFloor++;
-  gCurFloorTry[gCurFloor]++; //it was initialized as -1
-  if (gCurFloor >= 81) {
-    log('forever loop');
-    return 0;
-  }
-
-  //try value, get thisFloorTry candidate of this cell
-  let thisFloorTry = gCurFloorTry[gCurFloor];
-  let tryValue = 0;
-  let found = 0;
+  //get candidate array for this cell
+  let candiateList = new Array(gCandidate[idx][0]);
+  let n=0;
   for (let v = 1; v <= 9; v++) {
     if (gCandidate[idx][v] == 1) {
-      found++;
-      if (found == thisFloorTry+1) {
-        tryValue = v; 
-        break;
-      }
-      log('found = '+found+' thisFloorTry = '+thisFloorTry);
+      candiateList[n] = v;
+      n++;
     }
   }
-
-  if (found) {
-    updateCell('trialAndError('+thisFloorTry+'): current floor = '+gCurFloor, 'cell-'+idx , tryValue);
-    if (solveOneStep()) {
-      return 1;
-    }
-  }
+  let tryValue = candiateList[gFloorCandidateIndex[gCurFloor]];
+  let caller = 'trialAndError(floor=' + gCurFloor + ')';
+  updateCell(caller, 'cell-'+idx, tryValue);
+  if (solveOneStep())  return 1;
 
   return 0;
 }
 
+//check if this board has been solved or not
+//return -1 (unsolvable), 0 (not solved yet), 1 (solved) 
+function getBoardStatus()
+{
+  //log("calling getBoardStatus()");
+  for (let i = 0; i < 81; i++) {
+    if (gBoard[i]==0 && gCandidate[i][0]==0) return -1;
+  }
+
+  for (let i = 0; i < 81; i++) {    
+    if (gBoard[i]==0)  return 0;
+  }
+
+  return 1;
+}
+
+
 function solveOneStep()
 {
+  let isSolved = getBoardStatus();
+  if (isSolved == 1) {
+    log("Great! This board has been solved!");
+    return 0;
+  }
+
   log("calling solveOneStep()");
+
   if (updateByCandidate()) return 1;
   for (let v=1; v<=9; v++ ) {
     if(tryValueN(v)) {
@@ -775,20 +907,27 @@ function solveOneStep()
     $(id).style.backgroundColor= "#FFFFFF";
   }  
 
-
-  //check if this board has been solved or not
-  let isSolved = 1;
-  for (let i = 0; i < 81; i++) {
-    if (gCellStatus[i] == 1) {
-      isSolved = 0;
-      break;
-    }
-  }
-
+  //check again if this board has been solved or not
+  isSolved = getBoardStatus();
   if (isSolved == 0) {
+    //not solve yet, need to call trialAndError() again
     if (trialAndError() == 1) {
       return 1;
     }
+  }
+  else if (isSolved == -1) {
+    //unsolvable, need to reset the board to the end of previous floor then call trialAndError() again 
+    let msg = '(floor='+gCurFloor+', cellIdx='+gFloorCell[gCurFloor]+', candidateIndex='+gFloorCandidateIndex[gCurFloor]+')';
+    msg += ' is a wrong trial, cannot solve, try next candidate or swing back';
+    log('solveOneStep():' +msg);
+
+    updateBoardByArray(gBoardFloor[gCurFloor-1]);
+    updateArrayByBoard();
+    //call trialAndError(), solveOneStep(0 will be call inside this function, return 1 if any cell got updated
+    if(trialAndError() == 1) return 1;
+  }
+  else {
+    log("Great! This board has been solved!");
   }
 
   return 0;
@@ -803,26 +942,10 @@ function solveAll()
   }
 
   //reset all cell's backgroundColor 
-	for (let i = 0; i < 81; i++) {
-		id = "cell-" + i;
-		$(id).style.backgroundColor= "#FFFFFF";
-	}  
-
-  //check if this board can be solved or not
-  //if not, return to previous floor and try another value
-  log('cannot solve');
-  let cannotSolve = 0;
   for (let i = 0; i < 81; i++) {
-    if (gCellStatus[i] == 1 && gCandidate[i][0] == 0) {
-      cannotSolve = 1;
-      gCurFloor--;
-      log('gCurFloor = '+gCurFloor+' gCurFloorTry = '+gCurFloorTry+' wrong trial, cannot solve, try next candidate');
-      updateBoardByArray(gBoardFloor[gCurFloor]);
-      log('update board');
-      trialAndError();
-      break;
-    }
-  }
+    id = "cell-" + i;
+    $(id).style.backgroundColor= "#FFFFFF";
+  }  
 }
 
 
@@ -851,7 +974,11 @@ function solveAll()
       <input type="button" id="btn9" onclick="tryValueN(9)" value="9" style="width: 50px; border: 1px solid black;">
       <p id="msg2">log bar:</p>
       <input type="button" onclick="solveOneStep()" value="solve one step" style="width: 220px; border: 1px solid black;">
-      <input type="button" onclick="solveAll()" value="solve all" style="width: 220px; border: 1px solid black;">
+      <input type="button" onclick="solveAll()" value="solve all" style="width: 220px; border: 1px solid black;">      
+    </div>
+    <p></p>
+    <div class="container" id="floormsgcontainer">
+      <p id=floormsgbar">floor message bar:</p>
     </div>
   </body>
 </html>
